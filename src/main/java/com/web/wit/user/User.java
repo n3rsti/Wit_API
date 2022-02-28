@@ -15,6 +15,6 @@ public class User {
     }
 
     public String toString(){
-        return "User: " + username;
+        return String.format("User: %s", username);
     }
 }
