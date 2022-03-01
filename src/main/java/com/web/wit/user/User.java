@@ -1,20 +1,16 @@
 package com.web.wit.user;
 
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Data
+@Document
+@AllArgsConstructor
 public class User {
+    @Id
+    private String id;
     private String username;
-
-    public User(){
-
-    }
-    public User(String username){
-        this.username = username;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String toString(){
-        return String.format("User: %s", username);
-    }
 }
