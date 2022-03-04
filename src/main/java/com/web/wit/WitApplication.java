@@ -9,5 +9,4 @@ public class WitApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(WitApplication.class, args);
 	}
-
 }
