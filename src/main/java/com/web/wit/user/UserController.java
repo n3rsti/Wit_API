@@ -31,12 +31,12 @@ public class UserController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<User> createUser(@RequestBody User updatedUser) {
-        User user = userService.createUser(updatedUser);
-        if (user == null) {
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
+    public ResponseEntity<User> createUser(@RequestBody User user) {
+        User createdUser = userService.createUser(user);
+        if (createdUser != null) {
+            return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
         } else {
-            return new ResponseEntity<>(user, HttpStatus.CREATED);
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
 
     }

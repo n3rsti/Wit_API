@@ -24,11 +24,11 @@ public class UserService {
     }
 
 
-    public User createUser(User newUser) {
+    public User createUser(User user) {
         // Check if user with same unique fields already exists
-        User user = userRepository.findUserByUsername(newUser.getUsername());
-        if (user == null) {
-            return userRepository.insert(newUser);
+        User existingUser = userRepository.findUserByUsername(user.getUsername());
+        if (existingUser == null) {
+            return userRepository.insert(user);
         }
         return null;
     }
