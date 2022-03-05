@@ -15,11 +15,21 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public List<User> getUsers(){
+    public List<User> getUsers() {
         return userRepository.findAll();
     }
 
-    public Optional<User> getUserById(String id){
+    public Optional<User> getUserById(String id) {
         return userRepository.findById(id);
+    }
+
+
+    public User createUser(User newUser) {
+        // Check if user with same unique fields already exists
+        User user = userRepository.findUserByUsername(newUser.getUsername());
+        if (user == null) {
+            return userRepository.insert(newUser);
+        }
+        return null;
     }
 }
