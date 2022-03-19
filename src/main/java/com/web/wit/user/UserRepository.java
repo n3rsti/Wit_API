@@ -10,4 +10,11 @@ public interface UserRepository extends MongoRepository<User, String> {
      * @return User
      */
     User findUserByUsername(String username);
+
+    /**
+     * Delete user by id
+     *
+     * @param id - User id (_id)
+     */
+    void deleteUserById(String id);
 }

@@ -59,4 +59,10 @@ public class UserController {
         else
             return new ResponseEntity<>(HttpStatus.CONFLICT);
     }
+
+    @DeleteMapping(path = "/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable String id){
+        userService.deleteUser(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }
