@@ -1,6 +1,7 @@
 package com.web.wit.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,5 +32,13 @@ public class UserService {
             return userRepository.insert(user);
         }
         return null;
+    }
+
+    public User updateUser(User user) {
+        try {
+            return userRepository.save(user);
+        } catch (DataIntegrityViolationException e) {
+            return null;
+        }
     }
 }
