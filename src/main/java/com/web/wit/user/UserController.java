@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("api/v1/user")
+@RequestMapping("api/v1/users")
 public class UserController {
     private final UserService userService;
 
@@ -36,7 +36,7 @@ public class UserController {
     public ResponseEntity<User> createUser(@RequestBody User user, UriComponentsBuilder builder) {
         User createdUser = userService.createUser(user);
         if (createdUser != null) {
-            UriComponents uriComponents = builder.path("api/v1/user/{id}").buildAndExpand(user.getId());
+            UriComponents uriComponents = builder.path("api/v1/users/{id}").buildAndExpand(user.getId());
             return ResponseEntity.created(uriComponents.toUri()).body(user);
         } else {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
