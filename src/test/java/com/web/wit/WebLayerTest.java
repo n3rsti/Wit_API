@@ -4,12 +4,14 @@ package com.web.wit;
 import com.web.wit.user.User;
 import com.web.wit.user.UserRepository;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectWriter;
 
@@ -84,8 +86,11 @@ public class WebLayerTest {
         ).andExpect(status().isConflict());
     }
 
+    /* Valid headers:
+     * Content-Type: application/json
+     * */
     @Test
-    void createUserEndpointShouldReturnResponseInJsonFormat() throws Exception {
+    void createUserEndpointShouldReturnValidHeaders() throws Exception {
         User user = new User("user");
 
         // convert to JSON
@@ -99,6 +104,45 @@ public class WebLayerTest {
                 .andExpect(
                         content().contentType(MediaType.APPLICATION_JSON)
                 );
+    }
+
+    @Test
+    void getUserByIdEndpointWithValidInputShouldReturn200AndReturnUserData() throws Exception {
+        String userId = "userId";
+        String username = "user";
+
+        User user = new User("user");
+        user.setId(userId);
+
+        // convert to JSON
+        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+        String json = ow.writeValueAsString(user);
+
+        /*
+         * First request is creating user with unique data which wasn't used before,
+         * therefore it is valid and should return 201 Created. We test response code of first request just in case something
+         * goes wrong, even though this request isn't the subject of our test.
+         * */
+        this.mockMvc.perform(post("/api/v1/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isCreated());
+
+        /*
+         * This request is getting data of user created in previous request. It is valid and should return 200 OK.
+         */
+
+        MvcResult result = this.mockMvc.perform(get("/api/v1/users/" + userId))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        /*
+         * Check if response body contains user data.
+         * In this test we only check if response contains username
+         */
+        boolean contentContainsUsername = result.getResponse().getContentAsString().contains(username);
+
+        Assertions.assertTrue(contentContainsUsername);
     }
 
 }
