@@ -1,7 +1,6 @@
 package com.web.wit.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,20 +25,11 @@ public class UserService {
 
 
     public User createUser(User user) {
-        // Check if user with same unique fields already exists
-        User existingUser = userRepository.findUserByUsername(user.getUsername());
-        if (existingUser == null) {
-            return userRepository.insert(user);
-        }
-        return null;
+        return userRepository.insert(user);
     }
 
     public User updateUser(User user) {
-        try {
-            return userRepository.save(user);
-        } catch (DataIntegrityViolationException e) {
-            return null;
-        }
+        return userRepository.save(user);
     }
 
     public void deleteUser(String id) {

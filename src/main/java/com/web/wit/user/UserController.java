@@ -1,6 +1,7 @@
 package com.web.wit.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -34,11 +35,11 @@ public class UserController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<User> createUser(@RequestBody User user, UriComponentsBuilder builder) {
-        User createdUser = userService.createUser(user);
-        if (createdUser != null) {
+        try {
+            userService.createUser(user);
             UriComponents uriComponents = builder.path("api/v1/users/{id}").buildAndExpand(user.getId());
             return ResponseEntity.created(uriComponents.toUri()).body(user);
-        } else {
+        } catch (DataIntegrityViolationException e) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
 
@@ -47,21 +48,27 @@ public class UserController {
     @PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<User> updateUser(@RequestBody User user, @PathVariable String id) {
         // check if ID from request body is equal to ID from URL
-        if(!user.getId().equals(id))
+        if (user.getId() != null && !user.getId().equals(id))
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        
+
         // Check if user with provided ID exists
-        if(userService.getUserById(id).isEmpty())
+        if (userService.getUserById(id).isEmpty())
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        User updatedUser = userService.updateUser(user);
-        if (updatedUser != null)
+
+        if (user.getId() == null)
+            user.setId(id);
+
+        try {
+            User updatedUser = userService.updateUser(user);
             return new ResponseEntity<>(updatedUser, HttpStatus.OK);
-        else
+        } catch (DataIntegrityViolationException e) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
+
     }
 
     @DeleteMapping(path = "/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable String id){
+    public ResponseEntity<?> deleteUser(@PathVariable String id) {
         userService.deleteUser(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
