@@ -15,8 +15,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectWriter;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -145,4 +144,41 @@ public class WebLayerTest {
         Assertions.assertTrue(contentContainsUsername);
     }
 
+    @Test
+    void updateUserShouldReturnBadRequestWhenUserTriesToModifyId() throws Exception{
+        String userId = "userId";
+        String username = "user";
+
+        User user = new User(username);
+        user.setId(userId);
+
+        // convert to JSON
+        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+        String json = ow.writeValueAsString(user);
+
+        /*
+         * First request is creating user with unique data which wasn't used before,
+         * therefore it is valid and should return 201 Created. We test response code of first request just in case something
+         * goes wrong, even though this request isn't the subject of our test.
+         * */
+        this.mockMvc.perform(post("/api/v1/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isCreated());
+
+
+        /* Create new JSON with updated ID */
+        String newUserId = "changedUserId";
+        user.setId(newUserId);
+        json = ow.writeValueAsString(user);
+
+
+        /* Send PUT request on /api/v1/user/oldId
+        * with new ID in body which results in attempt to change ID
+        *  */
+        this.mockMvc.perform(put("/api/v1/users/" + userId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
+        ).andExpect(status().isBadRequest());
+    }
 }
