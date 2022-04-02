@@ -4,7 +4,6 @@ package com.web.wit.user;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
@@ -14,7 +13,6 @@ public class User {
     private String id;
 
     @JsonProperty("username")
-    @Indexed(unique = true)
     private String username;
 
     public User() {
