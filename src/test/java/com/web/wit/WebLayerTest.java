@@ -145,7 +145,7 @@ public class WebLayerTest {
     }
 
     @Test
-    void updateUserShouldReturnBadRequestWhenUserTriesToModifyId() throws Exception{
+    void updateUserShouldReturnBadRequestWhenUserTriesToModifyId() throws Exception {
         String userId = "userId";
         String username = "user";
 
@@ -174,11 +174,23 @@ public class WebLayerTest {
 
 
         /* Send PUT request on /api/v1/user/oldId
-        * with new ID in body which results in attempt to change ID
-        *  */
+         * with new ID in body which results in attempt to change ID
+         *  */
         this.mockMvc.perform(put("/api/v1/users/" + userId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json)
         ).andExpect(status().isBadRequest());
+    }
+
+    /* Simple test request. In this test we try to update not existing user, so
+     * we should receive HTTP 404 Not Found.
+     * */
+    @Test
+    void updateUserShouldReturnHTTPNotFoundWhenUserWithIdFromURIDoesntExist() throws Exception {
+        String testId = "notExistingId";
+        this.mockMvc.perform(put("/api/v1/users/" + testId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{}")
+        ).andExpect(status().isNotFound());
     }
 }
