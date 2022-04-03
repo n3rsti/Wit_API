@@ -244,4 +244,11 @@ public class WebLayerTest {
                 .content("{\"username\": \"" + changedUsername + "\"}")
         ).andExpect(status().isOk());
     }
+    
+    @Test
+    void deleteUserShouldReturnHTTPNoContent() throws Exception{
+        String userId = "userId";
+        this.mockMvc.perform(delete("/api/v1/users/" + userId))
+                .andExpect(status().isNoContent());
+    }
 }
