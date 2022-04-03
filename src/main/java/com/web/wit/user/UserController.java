@@ -46,10 +46,10 @@ public class UserController {
     }
 
     @PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<User> updateUser(@RequestBody User user, @PathVariable String id) {
+    public ResponseEntity<?> updateUser(@RequestBody User user, @PathVariable String id) {
         // check if ID from request body is equal to ID from URL
         if (user.getId() != null && !user.getId().equals(id))
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("ID from URI is not equal to ID from request body");
 
         // Check if user with provided ID exists
         if (userService.getUserById(id).isEmpty())
