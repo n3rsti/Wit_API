@@ -1,19 +1,21 @@
 package com.web.wit.user;
 
+import com.web.wit.role.Role;
+import com.web.wit.role.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.LookupOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class UserService {
+public class UserService implements IUserService {
     private final UserRepository userRepository;
-
     private final MongoTemplate mongoTemplate;
 
     @Autowired
@@ -28,6 +30,10 @@ public class UserService {
 
     public Optional<User> getUserById(String id) {
         return userRepository.findById(id);
+    }
+
+    public User findUserByUsername(String username){
+        return userRepository.findUserByUsername(username);
     }
 
     /* Returns user with joined posts */
