@@ -54,7 +54,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("ID from URI is not equal to ID from request body");
 
         // Check if user with provided ID exists
-        if (userService.getUserById(id).isEmpty())
+        if (userService.getUserById(id) == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         if (user.getId() == null)

@@ -19,4 +19,6 @@ public interface UserRepository extends MongoRepository<User, String> {
      * @param id - User id (_id)
      */
     void deleteUserById(String id);
+
+    User findUserById(String id);
 }
