@@ -1,16 +1,23 @@
 package com.web.wit.user;
 
+import com.web.wit.role.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.LookupOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Service
-public class UserService implements IUserService {
+public class UserService implements IUserService, UserDetailsService {
     private final UserRepository userRepository;
     private final MongoTemplate mongoTemplate;
 
@@ -18,6 +25,24 @@ public class UserService implements IUserService {
     public UserService(UserRepository userRepository, MongoTemplate mongoTemplate) {
         this.userRepository = userRepository;
         this.mongoTemplate = mongoTemplate;
+    }
+
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findUserByUsername(username);
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found");
+        }
+        Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        for (Role role : user.getRoles()) {
+            authorities.add(new SimpleGrantedAuthority(role.getName()));
+        }
+        return new org.springframework.security.core.userdetails.User(
+                user.getUsername(),
+                user.getPassword(),
+                authorities
+        );
     }
 
     public List<User> getUsers() {
@@ -28,7 +53,7 @@ public class UserService implements IUserService {
         return userRepository.findUserById(id);
     }
 
-    public User findUserByUsername(String username){
+    public User findUserByUsername(String username) {
         return userRepository.findUserByUsername(username);
     }
 

@@ -1,6 +1,5 @@
 package com.web.wit.user;
 
-import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -76,15 +75,5 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PostMapping("/roles")
-    public ResponseEntity<?> addRoleToUser(@RequestBody RoleForm roleForm){
-        userFacade.addRoleToUser(roleForm.getUsername(), roleForm.getRoleName());
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
 
-    @Data
-    class RoleForm{
-        private String username;
-        private String roleName;
-    }
 }
