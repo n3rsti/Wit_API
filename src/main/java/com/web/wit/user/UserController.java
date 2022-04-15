@@ -1,5 +1,6 @@
 package com.web.wit.user;
 
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -14,21 +15,21 @@ import java.util.List;
 @RestController
 @RequestMapping("api/v1/users")
 public class UserController {
-    private final UserService userService;
+    private final UserFacade userFacade;
 
     @Autowired
-    public UserController(UserService userService) {
-        this.userService = userService;
+    public UserController(UserFacade userFacade) {
+        this.userFacade = userFacade;
     }
 
     @GetMapping
     public List<User> getUsers() {
-        return userService.getFullUserList();
+        return userFacade.getFullUserList();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserById(@PathVariable String id) {
-        User user = userService.getFullUserById(id);
+        User user = userFacade.getFullUserById(id);
         if (user == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -38,7 +39,7 @@ public class UserController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<User> createUser(@RequestBody User user, UriComponentsBuilder builder) {
         try {
-            userService.createUser(user);
+            userFacade.createUser(user);
             UriComponents uriComponents = builder.path("api/v1/users/{id}").buildAndExpand(user.getId());
             return ResponseEntity.created(uriComponents.toUri()).body(user);
         } catch (DataIntegrityViolationException e) {
@@ -54,14 +55,14 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("ID from URI is not equal to ID from request body");
 
         // Check if user with provided ID exists
-        if (userService.getUserById(id) == null)
+        if (userFacade.getUserById(id) == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         if (user.getId() == null)
             user.setId(id);
 
         try {
-            User updatedUser = userService.updateUser(user);
+            User updatedUser = userFacade.updateUser(user);
             return new ResponseEntity<>(updatedUser, HttpStatus.OK);
         } catch (DataIntegrityViolationException e) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
@@ -71,7 +72,19 @@ public class UserController {
 
     @DeleteMapping(path = "/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable String id) {
-        userService.deleteUser(id);
+        userFacade.deleteUser(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PostMapping("/roles")
+    public ResponseEntity<?> addRoleToUser(@RequestBody RoleForm roleForm){
+        userFacade.addRoleToUser(roleForm.getUsername(), roleForm.getRoleName());
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Data
+    class RoleForm{
+        private String username;
+        private String roleName;
     }
 }
