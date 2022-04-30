@@ -1,5 +1,6 @@
 package com.web.wit.user;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -9,8 +10,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.List;
+import java.util.*;
 
+@Slf4j
 @RestController
 @RequestMapping("api/v1/users")
 public class UserController {
@@ -23,12 +25,12 @@ public class UserController {
 
     @GetMapping
     public List<User> getUsers() {
-        return userFacade.getFullUserList();
+        return userFacade.getUsers();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getUserById(@PathVariable String id) {
-        User user = userFacade.getFullUserById(id);
+    @GetMapping("/{username}")
+    public ResponseEntity<?> getUserByUsername(@PathVariable String username) {
+        User user = userFacade.getUserByUsername(username);
         if (user == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -39,7 +41,7 @@ public class UserController {
     public ResponseEntity<User> createUser(@RequestBody User user, UriComponentsBuilder builder) {
         try {
             userFacade.createUser(user);
-            UriComponents uriComponents = builder.path("api/v1/users/{id}").buildAndExpand(user.getId());
+            UriComponents uriComponents = builder.path("api/v1/users/{username}").buildAndExpand(user.getUsername());
             return ResponseEntity.created(uriComponents.toUri()).body(user);
         } catch (DataIntegrityViolationException e) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
@@ -47,18 +49,11 @@ public class UserController {
 
     }
 
-    @PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> updateUser(@RequestBody User user, @PathVariable String id) {
-        // check if ID from request body is equal to ID from URL
-        if (user.getId() != null && !user.getId().equals(id))
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("ID from URI is not equal to ID from request body");
-
-        // Check if user with provided ID exists
-        if (userFacade.getUserById(id) == null)
+    @PutMapping(path = "/{username}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> updateUser(@RequestBody User user, @PathVariable String username) {
+        // Check if user with provided username exists
+        if (userFacade.getUserByUsername(username) == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
-        if (user.getId() == null)
-            user.setId(id);
 
         try {
             User updatedUser = userFacade.updateUser(user);
@@ -69,9 +64,9 @@ public class UserController {
 
     }
 
-    @DeleteMapping(path = "/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable String id) {
-        userFacade.deleteUser(id);
+    @DeleteMapping(path = "/{username}")
+    public ResponseEntity<?> deleteUser(@PathVariable String username) {
+        userFacade.deleteUser(username);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

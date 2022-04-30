@@ -4,8 +4,6 @@ package com.web.wit.user;
 import com.web.wit.role.IRoleService;
 import com.web.wit.role.Role;
 import com.web.wit.role.RoleService;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,39 +19,23 @@ public class UserFacade {
         this.roleService = roleService;
     }
 
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userService.loadUserByUsername(username);
-    }
-
     public Role saveRole(Role role) {
         return roleService.saveRole(role);
     }
 
     public void addRoleToUser(String username, String roleName) {
-        User user = userService.findUserByUsername(username);
+        User user = userService.getUserByUsername(username);
         Role role = roleService.findRoleByName(roleName);
         user.getRoles().add(role);
         userService.updateUser(user);
     }
 
+    public User getUserByUsername(String username) {
+        return userService.getUserByUsername(username);
+    }
+
     public List<User> getUsers() {
         return userService.getUsers();
-    }
-
-    public User getUserById(String id) {
-        return userService.getUserById(id);
-    }
-
-    public User findUserByUsername(String username) {
-        return userService.findUserByUsername(username);
-    }
-
-    public User getFullUserById(String id) {
-        return userService.getUserById(id);
-    }
-
-    public List<User> getFullUserList() {
-        return userService.getFullUserList();
     }
 
     public User createUser(User user) {
@@ -64,7 +46,7 @@ public class UserFacade {
         return userService.updateUser(user);
     }
 
-    public void deleteUser(String id) {
-        userService.deleteUser(id);
+    public void deleteUser(String username) {
+        userService.deleteUser(username);
     }
 }

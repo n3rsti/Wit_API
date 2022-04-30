@@ -1,7 +1,6 @@
 package com.web.wit.user;
 
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.web.wit.post.Post;
 import com.web.wit.role.Role;
 import lombok.AllArgsConstructor;
@@ -20,9 +19,6 @@ import java.util.List;
 @NoArgsConstructor
 public class User {
     @Id
-    private String id;
-
-    @JsonProperty("username")
     private String username;
 
     private List<Post> postList;
