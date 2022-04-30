@@ -26,7 +26,7 @@ public class PostController {
         if (author == null) {
             return postService.getPosts();
         }
-        return postService.getPostsByAuthorId(author);
+        return postService.getPostsByAuthor(author);
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

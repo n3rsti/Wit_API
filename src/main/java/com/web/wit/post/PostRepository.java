@@ -7,5 +7,8 @@ import java.util.List;
 
 @Repository
 public interface PostRepository extends MongoRepository<Post, String> {
-    List<Post> findPostsByAuthorId(String authorId);
+    /**
+     * @param author author username
+     */
+    List<Post> findPostsByAuthor(String author);
 }

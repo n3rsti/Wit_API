@@ -18,8 +18,11 @@ public class PostService {
         return postRepository.findAll();
     }
 
-    public List<Post> getPostsByAuthorId(String authorId) {
-        return postRepository.findPostsByAuthorId(authorId);
+    /**
+     * @param author author username
+     */
+    public List<Post> getPostsByAuthor(String author) {
+        return postRepository.findPostsByAuthor(author);
     }
 
     public void createPost(Post post) {
