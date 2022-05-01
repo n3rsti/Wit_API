@@ -46,7 +46,7 @@ public class TokenController {
                 DecodedJWT decodedJWT = verifier.verify(refresh_token);
 
                 String username = decodedJWT.getSubject();
-                User user = userFacade.getUserByUsername(username);
+                User user = userFacade.getUserById(username);
 
                 // create new token
                 String accessToken = JWT.create()
