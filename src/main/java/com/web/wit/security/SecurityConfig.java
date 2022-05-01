@@ -15,7 +15,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 
 @Configuration
@@ -40,8 +39,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         // permit
-        http.authorizeRequests().antMatchers(GET, "/api/login", "/token/refresh/**").permitAll();
-        http.authorizeRequests().antMatchers(DELETE, "/api/v1/users/**").fullyAuthenticated();
+        http.authorizeRequests().antMatchers(GET, "/api/login", "/api/v1/token/refresh/**").permitAll();
 
         http.addFilter(customAuthenticationFilter);
 
