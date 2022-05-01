@@ -23,15 +23,15 @@ public class UserFacade {
         return roleService.saveRole(role);
     }
 
-    public void addRoleToUser(String username, String roleName) {
-        User user = userService.getUserByUsername(username);
+    public void addRoleToUser(String id, String roleName) {
+        User user = userService.getUserById(id);
         Role role = roleService.findRoleByName(roleName);
         user.getRoles().add(role);
         userService.updateUser(user);
     }
 
-    public User getUserByUsername(String username) {
-        return userService.getUserByUsername(username);
+    public User getUserById(String id) {
+        return userService.getUserById(id);
     }
 
     public List<User> getUsers() {
@@ -46,7 +46,7 @@ public class UserFacade {
         return userService.updateUser(user);
     }
 
-    public void deleteUser(String username) {
-        userService.deleteUser(username);
+    public void deleteUser(String id) {
+        userService.deleteUser(id);
     }
 }

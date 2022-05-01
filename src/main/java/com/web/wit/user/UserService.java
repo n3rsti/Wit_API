@@ -1,20 +1,16 @@
 package com.web.wit.user;
 
-import com.web.wit.role.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.LookupOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -28,21 +24,21 @@ public class UserService implements IUserService, UserDetailsService {
 
 
     /* Returns user with joined posts */
-    public User getUserByUsername(String username) {
+    public User getUserById(String id) {
         LookupOperation lookupOperation = LookupOperation.newLookup()
                 .from("post")
-                .localField("_username")
-                .foreignField("authorId")
+                .localField("_id")
+                .foreignField("author")
                 .as("postList");
-        Aggregation aggregation = Aggregation.newAggregation(Aggregation.match(Criteria.where("username").is(username)), lookupOperation);
+        Aggregation aggregation = Aggregation.newAggregation(Aggregation.match(Criteria.where("_id").is(id)), lookupOperation);
         return mongoTemplate.aggregate(aggregation, "user", User.class).getUniqueMappedResult();
     }
 
     public List<User> getUsers() {
         LookupOperation lookupOperation = LookupOperation.newLookup()
                 .from("post")
-                .localField("username")
-                .foreignField("authorId")
+                .localField("_id")
+                .foreignField("author")
                 .as("postList");
         Aggregation aggregation = Aggregation.newAggregation(lookupOperation);
         return mongoTemplate.aggregate(aggregation, "user", User.class).getMappedResults();
@@ -58,24 +54,17 @@ public class UserService implements IUserService, UserDetailsService {
         return userRepository.save(user);
     }
 
-    public void deleteUser(String username) {
-        userRepository.deleteUserByUsername(username);
+    public void deleteUser(String id) {
+        userRepository.deleteUserById(id);
     }
 
+    // NOTE: It is actually loadUserById, but we have to override loadUserByUsername
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findUserByUsername(username);
+    public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
+        User user = userRepository.findUserById(id);
         if (user == null) {
             throw new UsernameNotFoundException("User not found");
         }
-        Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        for (Role role : user.getRoles()) {
-            authorities.add(new SimpleGrantedAuthority(role.getName()));
-        }
-        return new org.springframework.security.core.userdetails.User(
-                user.getUsername(),
-                user.getPassword(),
-                authorities
-        );
+        return user;
     }
 }
