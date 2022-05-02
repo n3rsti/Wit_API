@@ -29,7 +29,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getUserByUsername(@PathVariable String id) {
+    public ResponseEntity<?> getUserById(@PathVariable String id) {
         User user = userFacade.getUserById(id);
         if (user == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

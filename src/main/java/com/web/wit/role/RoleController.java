@@ -33,13 +33,13 @@ public class RoleController {
 
     @PostMapping("/addtouser")
     public ResponseEntity<?> addRoleToUser(@RequestBody RoleForm roleForm){
-        userFacade.addRoleToUser(roleForm.getUsername(), roleForm.getRoleName());
+        userFacade.addRoleToUser(roleForm.getId(), roleForm.getRoleName());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Data
     class RoleForm{
-        private String username;
+        private String id; // user id
         private String roleName;
     }
 
