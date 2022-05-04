@@ -15,7 +15,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.*;
 
 @Configuration
 @EnableWebSecurity
@@ -32,17 +32,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManagerBean());
-        customAuthenticationFilter.setFilterProcessesUrl("/api/login");
+        customAuthenticationFilter.setFilterProcessesUrl("/api/v1/login");
 
         http.csrf().disable();
 
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-        // permit
-        http.authorizeRequests().antMatchers(GET, "/api/login", "/api/v1/token/refresh/**").permitAll();
+        // permit always
+        http.authorizeRequests().antMatchers(GET, "/api/v1/login", "/api/v1/token/refresh/**").permitAll();
+
+        // permit based on auth
+        http.authorizeRequests().antMatchers(DELETE, "/api/v1/users/{userId}/**").access("@userSecurity.hasUserId(authentication, #userId)");
+        http.authorizeRequests().antMatchers(PUT, "/api/v1/users/{userId}/**").access("@userSecurity.hasUserId(authentication, #userId)");
+
 
         http.addFilter(customAuthenticationFilter);
-
         http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 
