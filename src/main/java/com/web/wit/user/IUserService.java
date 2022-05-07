@@ -4,9 +4,11 @@ package com.web.wit.user;
 import java.util.List;
 
 public interface IUserService {
-    List<User> getUsers();
+    List<MappedUser> getUsers();
 
-    User getUserById(String id);
+    MappedUser getUserById(String id);
+
+    User getFullUserById(String id);
 
     User createUser(User user);
 

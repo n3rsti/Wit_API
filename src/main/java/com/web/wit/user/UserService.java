@@ -21,27 +21,33 @@ public class UserService implements IUserService, UserDetailsService {
     private final PasswordEncoder passwordEncoder;
 
 
-
-
     /* Returns user with joined posts */
-    public User getUserById(String id) {
+    public MappedUser getUserById(String id) {
         LookupOperation lookupOperation = LookupOperation.newLookup()
                 .from("post")
                 .localField("_id")
                 .foreignField("author")
                 .as("postList");
         Aggregation aggregation = Aggregation.newAggregation(Aggregation.match(Criteria.where("_id").is(id)), lookupOperation);
-        return mongoTemplate.aggregate(aggregation, "user", User.class).getUniqueMappedResult();
+        return mongoTemplate.aggregate(aggregation, "user", MappedUser.class).getUniqueMappedResult();
     }
 
-    public List<User> getUsers() {
+    /* This method is used mainly for things where we don't need any join operations (e.g. joining postList to user)
+    *  and for operations where User class is needed instead of MappedUser
+    *  It should never be used as endpoint response, because it contains whole user document from db
+    * */
+    public User getFullUserById(String id) {
+        return userRepository.findUserById(id);
+    }
+
+    public List<MappedUser> getUsers() {
         LookupOperation lookupOperation = LookupOperation.newLookup()
                 .from("post")
                 .localField("_id")
                 .foreignField("author")
                 .as("postList");
         Aggregation aggregation = Aggregation.newAggregation(lookupOperation);
-        return mongoTemplate.aggregate(aggregation, "user", User.class).getMappedResults();
+        return mongoTemplate.aggregate(aggregation, "user", MappedUser.class).getMappedResults();
     }
 
 

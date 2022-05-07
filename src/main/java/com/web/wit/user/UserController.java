@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.*;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -24,13 +24,13 @@ public class UserController {
     }
 
     @GetMapping
-    public List<User> getUsers() {
+    public List<MappedUser> getUsers() {
         return userFacade.getUsers();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserById(@PathVariable String id) {
-        User user = userFacade.getUserById(id);
+        MappedUser user = userFacade.getUserById(id);
         if (user == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

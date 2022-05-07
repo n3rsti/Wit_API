@@ -24,17 +24,21 @@ public class UserFacade {
     }
 
     public void addRoleToUser(String id, String roleName) {
-        User user = userService.getUserById(id);
+        User user = userService.getFullUserById(id);
         Role role = roleService.findRoleByName(roleName);
         user.getRoles().add(role);
         userService.updateUser(user);
     }
 
-    public User getUserById(String id) {
+    public MappedUser getUserById(String id) {
         return userService.getUserById(id);
     }
 
-    public List<User> getUsers() {
+    public User getFullUserById(String id) {
+        return userService.getFullUserById(id);
+    }
+
+    public List<MappedUser> getUsers() {
         return userService.getUsers();
     }
 
