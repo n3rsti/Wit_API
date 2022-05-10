@@ -71,7 +71,7 @@ public class UserController {
 
     @PatchMapping(path="/{username}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> patchUser(@RequestBody User user, @PathVariable String username){
-        if (!username.equals(user.getUsername())) {
+        if (user.getUsername() != null && !username.equals(user.getUsername())) {
             return new ResponseEntity<>("Username cannot be changed. Username from URL is not equal to username from body", HttpStatus.CONFLICT);
         }
 
@@ -86,7 +86,7 @@ public class UserController {
         if(user.getUsername() == null)
             user.setUsername(userDbSavedVersion.getUsername());
         if(user.getPassword() == null)
-            user.setId(userDbSavedVersion.getPassword());
+            user.setPassword(userDbSavedVersion.getPassword());
 
         try {
             User updatedUser = userFacade.updateUser(user);
