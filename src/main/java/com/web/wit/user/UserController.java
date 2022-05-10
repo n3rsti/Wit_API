@@ -55,9 +55,38 @@ public class UserController {
             return new ResponseEntity<>("Username cannot be changed. Username from URL is not equal to username from body", HttpStatus.CONFLICT);
         }
 
+        try {
+            User updatedUser = userFacade.updateUser(user);
+
+            // if user doesn't exist, updatedUser will be null
+            if(updatedUser == null){
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+        } catch (DataIntegrityViolationException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+        }
+
+    }
+
+    @PatchMapping(path="/{username}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> patchUser(@RequestBody User user, @PathVariable String username){
+        if (!username.equals(user.getUsername())) {
+            return new ResponseEntity<>("Username cannot be changed. Username from URL is not equal to username from body", HttpStatus.CONFLICT);
+        }
+
+        User userDbSavedVersion = userFacade.getFullUserByUsername(username);
+
         // Check if user with provided username exists
-        if (userFacade.getUserByUsername(username) == null)
+        if (userDbSavedVersion == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        if(user.getId() == null)
+            user.setId(userDbSavedVersion.getId());
+        if(user.getUsername() == null)
+            user.setUsername(userDbSavedVersion.getUsername());
+        if(user.getPassword() == null)
+            user.setId(userDbSavedVersion.getPassword());
 
         try {
             User updatedUser = userFacade.updateUser(user);
@@ -65,7 +94,6 @@ public class UserController {
         } catch (DataIntegrityViolationException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
         }
-
     }
 
     @DeleteMapping(path = "/{username}")
