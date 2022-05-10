@@ -51,6 +51,10 @@ public class UserController {
 
     @PutMapping(path = "/{username}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> updateUser(@RequestBody User user, @PathVariable String username) {
+        if (!username.equals(user.getUsername())) {
+            return new ResponseEntity<>("Username cannot be changed. Username from URL is not equal to username from body", HttpStatus.CONFLICT);
+        }
+
         // Check if user with provided username exists
         if (userFacade.getUserByUsername(username) == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -59,7 +63,7 @@ public class UserController {
             User updatedUser = userFacade.updateUser(user);
             return new ResponseEntity<>(updatedUser, HttpStatus.OK);
         } catch (DataIntegrityViolationException e) {
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
         }
 
     }
