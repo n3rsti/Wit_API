@@ -6,13 +6,13 @@ import java.util.List;
 public interface IUserService {
     List<MappedUser> getUsers();
 
-    MappedUser getUserById(String id);
+    MappedUser getUserByUsername(String username);
 
-    User getFullUserById(String id);
+    User getFullUserByUsername(String username);
 
     User createUser(User user);
 
     User updateUser(User user);
 
-    void deleteUser(String id);
+    void deleteUser(String username);
 }

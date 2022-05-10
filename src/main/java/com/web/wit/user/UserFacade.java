@@ -1,9 +1,6 @@
 package com.web.wit.user;
 
 
-import com.web.wit.role.IRoleService;
-import com.web.wit.role.Role;
-import com.web.wit.role.RoleService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,30 +9,17 @@ import java.util.List;
 @Service
 public class UserFacade {
     private final IUserService userService;
-    private final IRoleService roleService;
 
-    public UserFacade(UserService userService, RoleService roleService) {
+    public UserFacade(UserService userService) {
         this.userService = userService;
-        this.roleService = roleService;
     }
 
-    public Role saveRole(Role role) {
-        return roleService.saveRole(role);
+    public MappedUser getUserByUsername(String username) {
+        return userService.getUserByUsername(username);
     }
 
-    public void addRoleToUser(String id, String roleName) {
-        User user = userService.getFullUserById(id);
-        Role role = roleService.findRoleByName(roleName);
-        user.getRoles().add(role);
-        userService.updateUser(user);
-    }
-
-    public MappedUser getUserById(String id) {
-        return userService.getUserById(id);
-    }
-
-    public User getFullUserById(String id) {
-        return userService.getFullUserById(id);
+    public User getFullUserByUsername(String username) {
+        return userService.getFullUserByUsername(username);
     }
 
     public List<MappedUser> getUsers() {
@@ -50,7 +34,7 @@ public class UserFacade {
         return userService.updateUser(user);
     }
 
-    public void deleteUser(String id) {
-        userService.deleteUser(id);
+    public void deleteUser(String username) {
+        userService.deleteUser(username);
     }
 }

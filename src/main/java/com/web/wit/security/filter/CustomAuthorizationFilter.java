@@ -21,7 +21,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import static java.util.Arrays.stream;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
@@ -44,15 +43,11 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                     JWTVerifier verifier = JWT.require(algorithm).build();
                     DecodedJWT decodedJWT = verifier.verify(token);
 
-                    String id = decodedJWT.getSubject();
-                    String[] roles = decodedJWT.getClaim("roles").asArray(String.class);
-
+                    String username = decodedJWT.getSubject();
                     Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
-                    stream(roles).forEach(role -> {
-                        authorities.add(new SimpleGrantedAuthority(role));
-                    });
 
-                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(id, null, authorities);
+
+                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, null, authorities);
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                     filterChain.doFilter(request, response);
                 } catch (Exception exception) {

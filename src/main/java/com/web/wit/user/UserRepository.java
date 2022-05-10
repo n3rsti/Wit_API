@@ -8,15 +8,17 @@ public interface UserRepository extends MongoRepository<User, String> {
     /**
      * Gets user by username
      *
-     * @param id User id (main username)
+     * @param username Username (main username, unique, uneditable)
      * @return User
      */
-    User findUserById(String id);
+    User findUserByUsername(String username);
 
     /**
-     * Delete user by id
+     * Delete user by username
      *
-     * @param id User id (main username)
+     * @param username Username (main username, unique, uneditable)
      */
-    void deleteUserById(String id);
+    void deleteUserByUsername(String username);
+
+    User findUserById(String id);
 }
