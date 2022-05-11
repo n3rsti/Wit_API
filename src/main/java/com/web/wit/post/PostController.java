@@ -5,11 +5,13 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("api/v1/posts")
@@ -30,9 +32,28 @@ public class PostController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Post> createPost(@RequestBody Post post, UriComponentsBuilder builder) {
+    public ResponseEntity<?> createPost(Authentication authentication, @RequestBody Post post, UriComponentsBuilder builder) {
+        // Do not allow custom post ID, it will be generated later in mongoDB
+        post.setId(null);
+
+
+        if (post.getContent() == null || post.getContent().equals("")) {
+            return new ResponseEntity<>("Post content cannot be empty", HttpStatus.BAD_REQUEST);
+        }
+
+
+        /* If author wasn't specified, assign author value to JWT subject */
+        if (post.getAuthor() == null) {
+            post.setAuthor(authentication.getPrincipal().toString());
+        }
+        /* Check for attempt to create Post with different author */
+        else if (!Objects.equals(post.getAuthor(), authentication.getPrincipal().toString())) {
+            return new ResponseEntity<>("Cannot create post with different author", HttpStatus.UNAUTHORIZED);
+        }
         try {
             postService.createPost(post);
+            
+            // set HTTP Location header to POST URI
             UriComponents uriComponents = builder.path("api/v1/posts/{id}").buildAndExpand(post.getId());
             return ResponseEntity.created(uriComponents.toUri()).body(post);
         } catch (DataIntegrityViolationException e) {
