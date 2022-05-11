@@ -42,7 +42,7 @@ public class PostController {
         }
 
 
-        /* If author wasn't specified, assign author value to JWT subject */
+        /* If author wasn't specified, assign JWT subject value to author field  */
         if (post.getAuthor() == null) {
             post.setAuthor(authentication.getPrincipal().toString());
         }
@@ -52,7 +52,7 @@ public class PostController {
         }
         try {
             postService.createPost(post);
-            
+
             // set HTTP Location header to POST URI
             UriComponents uriComponents = builder.path("api/v1/posts/{id}").buildAndExpand(post.getId());
             return ResponseEntity.created(uriComponents.toUri()).body(post);
