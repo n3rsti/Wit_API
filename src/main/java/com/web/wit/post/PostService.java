@@ -9,6 +9,7 @@ import java.util.List;
 public class PostService {
     private final PostRepository postRepository;
 
+
     @Autowired
     public PostService(PostRepository postRepository) {
         this.postRepository = postRepository;
@@ -18,6 +19,10 @@ public class PostService {
         return postRepository.findAll();
     }
 
+    public Post findPostById(String id) {
+        return postRepository.findPostById(id);
+    }
+
     /**
      * @param author author username
      */
@@ -25,7 +30,7 @@ public class PostService {
         return postRepository.findPostsByAuthor(author);
     }
 
-    public void createPost(Post post) {
-        postRepository.insert(post);
+    public Post createPost(Post post) {
+        return postRepository.insert(post);
     }
 }

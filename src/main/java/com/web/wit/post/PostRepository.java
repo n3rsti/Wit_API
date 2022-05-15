@@ -11,4 +11,6 @@ public interface PostRepository extends MongoRepository<Post, String> {
      * @param author author username
      */
     List<Post> findPostsByAuthor(String author);
+
+    Post findPostById(String id);
 }

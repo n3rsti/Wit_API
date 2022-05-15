@@ -11,24 +11,32 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("api/v1/posts")
 public class PostController {
-    private final PostService postService;
+    private final PostFacade postFacade;
 
     @Autowired
-    public PostController(PostService postService) {
-        this.postService = postService;
+    public PostController(PostFacade postFacade) {
+        this.postFacade = postFacade;
     }
 
     @GetMapping
     public List<Post> getPosts(@RequestParam(required = false) String author) {
         if (author == null) {
-            return postService.getPosts();
+            return postFacade.getPosts();
         }
-        return postService.getPostsByAuthor(author);
+        return postFacade.getPostsByAuthor(author);
+    }
+
+    @GetMapping(path="/{postId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> findPostById(@PathVariable String postId){
+        MappedPost post = postFacade.findPostById(postId);
+        if(post == null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(post, HttpStatus.OK);
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -36,26 +44,19 @@ public class PostController {
         // Do not allow custom post ID, it will be generated later in mongoDB
         post.setId(null);
 
+        // Set author to JWT Subject
+        post.setAuthor(authentication.getPrincipal().toString());
+
 
         if (post.getContent() == null || post.getContent().equals("")) {
             return new ResponseEntity<>("Post content cannot be empty", HttpStatus.BAD_REQUEST);
         }
-
-
-        /* If author wasn't specified, assign JWT subject value to author field  */
-        if (post.getAuthor() == null) {
-            post.setAuthor(authentication.getPrincipal().toString());
-        }
-        /* Check for attempt to create Post with different author */
-        else if (!Objects.equals(post.getAuthor(), authentication.getPrincipal().toString())) {
-            return new ResponseEntity<>("Cannot create post with different author", HttpStatus.UNAUTHORIZED);
-        }
         try {
-            postService.createPost(post);
+            Post createdPost = postFacade.createPost(post);
 
             // set HTTP Location header to POST URI
             UriComponents uriComponents = builder.path("api/v1/posts/{id}").buildAndExpand(post.getId());
-            return ResponseEntity.created(uriComponents.toUri()).body(post);
+            return ResponseEntity.created(uriComponents.toUri()).body(createdPost);
         } catch (DataIntegrityViolationException e) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
