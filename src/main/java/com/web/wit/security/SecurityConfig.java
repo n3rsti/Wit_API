@@ -40,6 +40,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         // permit always
         http.authorizeRequests().antMatchers(GET, "/api/v1/login", "/api/v1/token/refresh/**").permitAll();
+        http.authorizeRequests().antMatchers(POST, "/api/v1/users").permitAll();
 
         // permit based on auth
         http.authorizeRequests().antMatchers(DELETE, "/api/v1/users/{userId}/**").access("@userSecurity.hasUserId(authentication, #userId)");
