@@ -55,4 +55,12 @@ public class PostFacade {
         return commentService.createComment(comment);
     }
 
+    public void deleteCommentById(String commentId){
+        commentService.deleteCommentById(commentId);
+    }
+
+    public Comment findCommentById(String commentId){
+        return commentService.findCommentById(commentId);
+    }
+
 }

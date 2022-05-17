@@ -12,7 +12,15 @@ public class CommentService {
         this.commentRepository = commentRepository;
     }
 
-    public Comment createComment(Comment comment){
+    public Comment createComment(Comment comment) {
         return commentRepository.save(comment);
+    }
+
+    public void deleteCommentById(String commentId) {
+        commentRepository.deleteById(commentId);
+    }
+
+    public Comment findCommentById(String commentId) {
+        return commentRepository.findCommentById(commentId);
     }
 }
