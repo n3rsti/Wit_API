@@ -1,12 +1,15 @@
 package com.web.wit.comment;
 
 import com.web.wit.post.PostFacade;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import javax.el.PropertyNotFoundException;
 
 @RestController()
 @RequestMapping("/api/v1/")
@@ -25,9 +28,16 @@ public class CommentController {
         // set author to JWT subject
         comment.setAuthor(authentication.getPrincipal().toString());
 
-        Comment createdComment = postFacade.createComment(comment);
-        UriComponents uriComponents = builder.path("/api/v1/posts/{postId}/comments/{commentId}/")
-                .buildAndExpand(createdComment.getPostId(), createdComment.getId());
-        return ResponseEntity.created(uriComponents.toUri()).body(createdComment);
+        try {
+            Comment createdComment = postFacade.createComment(comment);
+            UriComponents uriComponents = builder.path("/api/v1/posts/{postId}/comments/{commentId}/")
+                    .buildAndExpand(createdComment.getPostId(), createdComment.getId());
+            return ResponseEntity.created(uriComponents.toUri()).body(createdComment);
+        }
+        catch(PropertyNotFoundException e){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+
     }
 }

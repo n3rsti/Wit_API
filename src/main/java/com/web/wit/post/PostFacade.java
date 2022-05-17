@@ -6,6 +6,7 @@ import com.web.wit.user.User;
 import com.web.wit.user.UserService;
 import org.springframework.stereotype.Service;
 
+import javax.el.PropertyNotFoundException;
 import java.util.List;
 
 @Service
@@ -47,6 +48,10 @@ public class PostFacade {
     }
 
     public Comment createComment(Comment comment){
+        Post post = postService.findPostById(comment.getPostId());
+        if(post == null){
+            throw new PropertyNotFoundException("Post ID: " + comment.getPostId() + " doesn't exist");
+        }
         return commentService.createComment(comment);
     }
 
