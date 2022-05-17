@@ -1,5 +1,7 @@
 package com.web.wit.post;
 
+import com.web.wit.comment.Comment;
+import com.web.wit.comment.CommentService;
 import com.web.wit.user.User;
 import com.web.wit.user.UserService;
 import org.springframework.stereotype.Service;
@@ -10,10 +12,12 @@ import java.util.List;
 public class PostFacade {
     private final PostService postService;
     private final UserService userService;
+    private final CommentService commentService;
 
-    public PostFacade(PostService postService, UserService userService) {
+    public PostFacade(PostService postService, UserService userService, CommentService commentService) {
         this.postService = postService;
         this.userService = userService;
+        this.commentService = commentService;
     }
 
     public List<Post> getPosts() {
@@ -40,6 +44,10 @@ public class PostFacade {
 
     public Post createPost(Post post) {
         return postService.createPost(post);
+    }
+
+    public Comment createComment(Comment comment){
+        return commentService.createComment(comment);
     }
 
 }
