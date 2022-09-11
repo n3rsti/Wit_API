@@ -19,7 +19,8 @@ class UserRepositoryTest {
 
     @Test
     void findUserByUsernameShouldReturnValidUserObject() {
-        User user = new User("test");
+        User user = new User();
+        user.setUsername("test");
         userRepository.save(user);
 
         User actual = userRepository.findUserByUsername("test");
