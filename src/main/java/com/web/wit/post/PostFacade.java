@@ -52,6 +52,11 @@ public class PostFacade {
         if(post == null){
             throw new PropertyNotFoundException("Post ID: " + comment.getPostId() + " doesn't exist");
         }
+        if(comment.getParentCommentId() != null){
+            Comment parentComment = commentService.findCommentById(comment.getParentCommentId());
+            if(parentComment == null)
+                throw new PropertyNotFoundException("Comment ID: " + comment.getParentCommentId() + " doesn't exist");
+        }
         return commentService.createComment(comment);
     }
 

@@ -12,6 +12,8 @@ public class Comment {
 
     private String postId;
 
+    private String parentCommentId;
+
     private String author;
 
     private String content;
