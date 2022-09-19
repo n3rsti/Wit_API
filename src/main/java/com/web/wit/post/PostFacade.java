@@ -2,6 +2,7 @@ package com.web.wit.post;
 
 import com.web.wit.comment.Comment;
 import com.web.wit.comment.CommentService;
+import com.web.wit.comment.MappedComment;
 import com.web.wit.user.User;
 import com.web.wit.user.UserService;
 import lombok.RequiredArgsConstructor;
@@ -89,6 +90,10 @@ public class PostFacade {
 
     public Comment findCommentById(String commentId){
         return commentService.findCommentById(commentId);
+    }
+
+    public MappedComment findFullCommentById(String commentId){
+        return commentService.findFullCommentById(commentId);
     }
 
 }
