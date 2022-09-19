@@ -92,8 +92,34 @@ public class PostFacade {
         return commentService.findCommentById(commentId);
     }
 
-    public MappedComment findFullCommentById(String commentId){
-        return commentService.findFullCommentById(commentId);
+    public MappedComment findFullCommentById(String commentId) {
+        LookupOperation lookupOperation = LookupOperation.newLookup()
+                .from("comment")
+                .localField("_id.str")
+                .foreignField("parentCommentId.str")
+                .as("comments");
+
+        Aggregation aggregation = Aggregation.newAggregation(Aggregation.match(Criteria.where("_id").is(commentId)), lookupOperation);
+
+        MappedComment mappedComment = mongoTemplate.aggregate(aggregation, "comment", MappedComment.class).getUniqueMappedResult();
+
+        if(mappedComment == null){
+            return null;
+        }
+
+
+        // TODO: refactor
+        // for some reason first joined comment is always the comment itself
+        List<Comment> replies = mappedComment.getComments();
+        replies.remove(0);
+
+        mappedComment.setComments(replies);
+
+        User author = userService.getFullUserByUsername((String)mappedComment.getAuthor());
+        mappedComment.setAuthor(author);
+
+
+        return mappedComment;
     }
 
 }
