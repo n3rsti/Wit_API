@@ -4,22 +4,24 @@ import com.web.wit.comment.Comment;
 import com.web.wit.comment.CommentService;
 import com.web.wit.user.User;
 import com.web.wit.user.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.LookupOperation;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
 import javax.el.PropertyNotFoundException;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class PostFacade {
     private final PostService postService;
     private final UserService userService;
     private final CommentService commentService;
 
-    public PostFacade(PostService postService, UserService userService, CommentService commentService) {
-        this.postService = postService;
-        this.userService = userService;
-        this.commentService = commentService;
-    }
+    private final MongoTemplate mongoTemplate;
 
     public List<Post> getPosts() {
         return postService.getPosts();
@@ -30,12 +32,32 @@ public class PostFacade {
     }
 
     public MappedPost findPostById(String postId) {
+        LookupOperation lookupOperation = LookupOperation.newLookup()
+                .from("comment")
+                .localField("_id.str")
+                .foreignField("postId.str")
+                .as("comments");
+
+        Aggregation aggregation = Aggregation.newAggregation(Aggregation.match(Criteria.where("_id").is(postId)), lookupOperation);
+
+        MappedPost mappedPost = mongoTemplate.aggregate(aggregation, "post", MappedPost.class).getUniqueMappedResult();
+        if(mappedPost == null)
+            return null;
+
+
+        // TODO: this is shit, but idk how to do it yet
+        Comment[] comments = new Comment[mappedPost.getComments().length];
+
+        for(int i = 0; i < mappedPost.getComments().length; i++){
+            if(mappedPost.getComments()[i].getParentCommentId() != null){
+                comments[i] = mappedPost.getComments()[i];
+            }
+        }
+
+        mappedPost.setComments(comments);
+
         Post post = postService.findPostById(postId);
         User author = userService.getFullUserByUsername(post.getAuthor());
-
-        MappedPost mappedPost = new MappedPost();
-        mappedPost.setId(post.getId());
-        mappedPost.setContent(post.getContent());
 
 
         mappedPost.setAuthor(author);
