@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
 import javax.el.PropertyNotFoundException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -46,11 +47,11 @@ public class PostFacade {
 
 
         // TODO: this is shit, but idk how to do it yet
-        Comment[] comments = new Comment[mappedPost.getComments().length];
+        List<Comment> comments = new ArrayList<>();
 
-        for(int i = 0; i < mappedPost.getComments().length; i++){
-            if(mappedPost.getComments()[i].getParentCommentId() != null){
-                comments[i] = mappedPost.getComments()[i];
+        for(Comment comment : mappedPost.getComments()){
+            if(comment.getParentCommentId() == null){
+                comments.add(comment);
             }
         }
 
