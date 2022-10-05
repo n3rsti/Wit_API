@@ -53,4 +53,13 @@ public class CommentController {
         postFacade.deleteCommentById(commentId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    @GetMapping(path = "posts/{postId}/comments/{commentId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getComment(@PathVariable String commentId){
+        MappedComment comment = postFacade.findFullCommentById(commentId);
+        if(comment == null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        return new ResponseEntity<>(comment, HttpStatus.OK);
+    }
 }

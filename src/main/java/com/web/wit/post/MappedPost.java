@@ -1,6 +1,9 @@
 package com.web.wit.post;
 
+import com.web.wit.comment.Comment;
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 public class MappedPost {
@@ -9,4 +12,6 @@ public class MappedPost {
     private Object author;
 
     private String content;
+
+    private List<Comment> comments;
 }
