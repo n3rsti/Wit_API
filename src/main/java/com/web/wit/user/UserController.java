@@ -85,8 +85,10 @@ public class UserController {
             user.setId(userDbSavedVersion.getId());
         if(user.getUsername() == null)
             user.setUsername(userDbSavedVersion.getUsername());
-        if(user.getPassword() == null)
-            user.setPassword(userDbSavedVersion.getPassword());
+        if(user.getProfileImage() == null)
+            user.setProfileImage(userDbSavedVersion.getProfileImage());
+        if(user.getBackgroundImage() == null)
+            user.setBackgroundImage(userDbSavedVersion.getBackgroundImage());
 
         try {
             User updatedUser = userFacade.updateUser(user);

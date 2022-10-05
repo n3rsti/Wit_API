@@ -87,7 +87,10 @@ public class UserService implements IUserService, UserDetailsService {
 
 
             // encode password
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            if(user.getPassword() != null)
+                user.setPassword(passwordEncoder.encode(user.getPassword()));
+            else
+                user.setPassword(userDbSavedVersion.getPassword());
 
             return userRepository.save(user);
         }

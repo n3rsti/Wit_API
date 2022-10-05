@@ -21,6 +21,10 @@ public class User {
     @Indexed(unique = true)
     private String username;
 
+    private String profileImage;
+
+    private String backgroundImage;
+
     @JsonProperty( value = "password", access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 }

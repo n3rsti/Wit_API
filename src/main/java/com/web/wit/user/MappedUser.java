@@ -12,5 +12,9 @@ public class MappedUser {
 
     private String username;
 
+    private String profileImage;
+
+    private String backgroundImage;
+
     private List<Post> postList;
 }
