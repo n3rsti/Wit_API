@@ -33,6 +33,11 @@ public class PostFacade {
         return postService.getPostsByAuthor(author);
     }
 
+    // without any JOIN operations, only info from DB
+    public Post findPostInfoById(String postId) {
+        return postService.findPostById(postId);
+    }
+
     public MappedPost findPostById(String postId) {
         LookupOperation lookupOperation = LookupOperation.newLookup()
                 .from("comment")
@@ -43,15 +48,15 @@ public class PostFacade {
         Aggregation aggregation = Aggregation.newAggregation(Aggregation.match(Criteria.where("_id").is(postId)), lookupOperation);
 
         MappedPost mappedPost = mongoTemplate.aggregate(aggregation, "post", MappedPost.class).getUniqueMappedResult();
-        if(mappedPost == null)
+        if (mappedPost == null)
             return null;
 
 
         // TODO: this is shit, but idk how to do it yet
         List<Comment> comments = new ArrayList<>();
 
-        for(Comment comment : mappedPost.getComments()){
-            if(comment.getParentCommentId() == null){
+        for (Comment comment : mappedPost.getComments()) {
+            if (comment.getParentCommentId() == null) {
                 comments.add(comment);
             }
         }
@@ -71,24 +76,24 @@ public class PostFacade {
         return postService.createPost(post);
     }
 
-    public Comment createComment(Comment comment){
+    public Comment createComment(Comment comment) {
         Post post = postService.findPostById(comment.getPostId());
-        if(post == null){
+        if (post == null) {
             throw new PropertyNotFoundException("Post ID: " + comment.getPostId() + " doesn't exist");
         }
-        if(comment.getParentCommentId() != null){
+        if (comment.getParentCommentId() != null) {
             Comment parentComment = commentService.findCommentById(comment.getParentCommentId());
-            if(parentComment == null)
+            if (parentComment == null)
                 throw new PropertyNotFoundException("Comment ID: " + comment.getParentCommentId() + " doesn't exist");
         }
         return commentService.createComment(comment);
     }
 
-    public void deleteCommentById(String commentId){
+    public void deleteCommentById(String commentId) {
         commentService.deleteCommentById(commentId);
     }
 
-    public Comment findCommentById(String commentId){
+    public Comment findCommentById(String commentId) {
         return commentService.findCommentById(commentId);
     }
 
@@ -103,7 +108,7 @@ public class PostFacade {
 
         MappedComment mappedComment = mongoTemplate.aggregate(aggregation, "comment", MappedComment.class).getUniqueMappedResult();
 
-        if(mappedComment == null){
+        if (mappedComment == null) {
             return null;
         }
 
@@ -115,11 +120,14 @@ public class PostFacade {
 
         mappedComment.setComments(replies);
 
-        User author = userService.getFullUserByUsername((String)mappedComment.getAuthor());
+        User author = userService.getFullUserByUsername((String) mappedComment.getAuthor());
         mappedComment.setAuthor(author);
 
 
         return mappedComment;
     }
 
+    public void deletePost(Post post) {
+        postService.deletePost(post);
+    }
 }

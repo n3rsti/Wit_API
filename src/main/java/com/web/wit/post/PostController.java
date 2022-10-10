@@ -11,6 +11,7 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("api/v1/posts")
@@ -61,5 +62,15 @@ public class PostController {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
 
+    }
+
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<?> deletePost(Authentication authentication, @PathVariable String postId){
+        Post post = postFacade.findPostInfoById(postId);
+        if(!Objects.equals(post.getAuthor(), authentication.getPrincipal().toString()))
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+
+        postFacade.deletePost(post);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

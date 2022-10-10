@@ -32,4 +32,11 @@ public class PostService {
     public Post createPost(Post post) {
         return postRepository.insert(post);
     }
+
+    public void deletePost(Post post) {
+        post.setAuthor(null);
+        post.setContent(null);
+
+        postRepository.save(post);
+    }
 }

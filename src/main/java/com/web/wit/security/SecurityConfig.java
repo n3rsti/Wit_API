@@ -39,7 +39,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         // permit always
-        http.authorizeRequests().antMatchers(GET, "/api/v1/login", "/api/v1/token/refresh/**").permitAll();
+        http.authorizeRequests().antMatchers(GET, "/api/v1/login", "/api/v1/token/refresh/**", "/api/v1/posts/**", "/api/v1/users/**").permitAll();
         http.authorizeRequests().antMatchers(POST, "/api/v1/users").permitAll();
 
         // permit based on auth
