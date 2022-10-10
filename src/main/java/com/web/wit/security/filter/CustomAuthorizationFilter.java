@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 @Slf4j
@@ -57,7 +57,8 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                     error.put("error_message", exception.getMessage());
 
                     response.setContentType(APPLICATION_JSON_VALUE);
-                    response.setStatus(FORBIDDEN.value());
+                    response.setStatus(UNAUTHORIZED.value());
+                    response.addHeader("WWW-Authenticate", "Invalid JWT");
 
                     new ObjectMapper().writeValue(response.getOutputStream(), error);
                 }
