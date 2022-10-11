@@ -11,6 +11,7 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @RestController
@@ -23,12 +24,17 @@ public class PostController {
         this.postFacade = postFacade;
     }
 
-    @GetMapping
-    public List<Post> getPosts(@RequestParam(required = false) String author) {
-        if (author == null) {
-            return postFacade.getPosts();
-        }
-        return postFacade.getPostsByAuthor(author);
+//    @GetMapping
+//    public List<Post> getPosts(@RequestParam(required = false) String author) {
+//        if (author == null) {
+//            return postFacade.getPosts();
+//        }
+//        return postFacade.getPostsByAuthor(author);
+//    }
+
+    @GetMapping()
+    public List<MappedPost> getPostsWithAuthor(){
+        return postFacade.getPostsWithAuthor();
     }
 
     @GetMapping(path="/{postId}", produces = MediaType.APPLICATION_JSON_VALUE)

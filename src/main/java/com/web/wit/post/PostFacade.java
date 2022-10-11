@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import javax.el.PropertyNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +28,19 @@ public class PostFacade {
 
     public List<Post> getPosts() {
         return postService.getPosts();
+    }
+
+    public List<MappedPost> getPostsWithAuthor(){
+        LookupOperation lookupOperation = LookupOperation.newLookup()
+                .from("user")
+                .localField("author")
+                .foreignField("username")
+                .as("author");
+
+        Aggregation aggregation = Aggregation.newAggregation(Aggregation.match(Criteria.where("content").ne(null)), lookupOperation);
+
+        return mongoTemplate.aggregate(aggregation, "post", MappedPost.class).getMappedResults();
+
     }
 
     public List<Post> getPostsByAuthor(String author) {
