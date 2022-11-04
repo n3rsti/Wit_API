@@ -14,4 +14,6 @@ public class MappedPost {
     private String content;
 
     private List<Comment> comments;
+
+    private int commentCount = 0;
 }

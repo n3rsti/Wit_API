@@ -53,13 +53,22 @@ public class PostFacade {
     }
 
     public MappedPost findPostById(String postId) {
-        LookupOperation lookupOperation = LookupOperation.newLookup()
+        LookupOperation commentJoinOperation = LookupOperation.newLookup()
                 .from("comment")
                 .localField("_id.str")
                 .foreignField("postId.str")
                 .as("comments");
 
-        Aggregation aggregation = Aggregation.newAggregation(Aggregation.match(Criteria.where("_id").is(postId)), lookupOperation);
+
+        LookupOperation authorJoinOperation = LookupOperation.newLookup()
+                .from("user")
+                .localField("author")
+                .foreignField("username")
+                .as("author");
+
+
+        /* This comment is in honor of github copilot which solved my weeks long problem in 5 min */
+        Aggregation aggregation = Aggregation.newAggregation(Aggregation.match(Criteria.where("_id").is(postId)), authorJoinOperation, commentJoinOperation);
 
         MappedPost mappedPost = mongoTemplate.aggregate(aggregation, "post", MappedPost.class).getUniqueMappedResult();
         if (mappedPost == null)
@@ -143,5 +152,9 @@ public class PostFacade {
 
     public void deletePost(Post post) {
         postService.deletePost(post);
+    }
+
+    public List<Comment> findCommentsByPostId(String postId){
+        return commentService.findCommentsByPostId(postId);
     }
 }

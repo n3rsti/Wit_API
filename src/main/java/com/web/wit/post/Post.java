@@ -15,4 +15,6 @@ public class Post {
     private String author;
 
     private String content;
+
+    private int commentCount = 0;
 }

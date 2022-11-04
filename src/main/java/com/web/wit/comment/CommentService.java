@@ -29,4 +29,8 @@ public class CommentService {
     public Comment findCommentById(String commentId) {
         return commentRepository.findCommentById(commentId);
     }
+
+    public List<Comment> findCommentsByPostId(String postId){
+        return commentRepository.findCommentsByPostId(postId);
+    }
 }

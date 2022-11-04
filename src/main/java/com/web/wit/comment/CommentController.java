@@ -10,6 +10,7 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.el.PropertyNotFoundException;
+import java.util.List;
 
 @RestController()
 @RequestMapping("/api/v1/")
@@ -62,4 +63,11 @@ public class CommentController {
 
         return new ResponseEntity<>(comment, HttpStatus.OK);
     }
+
+    @GetMapping(path="posts/{postId}/comments")
+    public List<Comment> getCommentsByPostId(@PathVariable String postId){
+        return postFacade.findCommentsByPostId(postId);
+    }
+
+
 }
