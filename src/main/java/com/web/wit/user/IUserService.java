@@ -6,7 +6,7 @@ import java.util.List;
 public interface IUserService {
     List<MappedUser> getUsers();
 
-    MappedUser getUserByUsername(String username);
+    User getUserByUsername(String username);
 
     User getFullUserByUsername(String username);
 

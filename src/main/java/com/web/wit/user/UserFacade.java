@@ -1,6 +1,13 @@
 package com.web.wit.user;
 
 
+import com.web.wit.comment.Comment;
+import com.web.wit.comment.CommentService;
+import com.web.wit.post.Post;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.LookupOperation;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,12 +17,42 @@ import java.util.List;
 public class UserFacade {
     private final IUserService userService;
 
-    public UserFacade(UserService userService) {
+    private final CommentService commentService;
+
+    private final MongoTemplate mongoTemplate;
+
+    public UserFacade(UserService userService, CommentService commentService, MongoTemplate mongoTemplate) {
         this.userService = userService;
+        this.commentService = commentService;
+        this.mongoTemplate = mongoTemplate;
     }
 
     public MappedUser getUserByUsername(String username) {
-        return userService.getUserByUsername(username);
+        /* Join post collection with user collection  */
+        LookupOperation lookupOperation = LookupOperation.newLookup()
+                .from("post")
+                .localField("username")
+                .foreignField("author")
+                .as("postList");
+
+        Aggregation aggregation = Aggregation.newAggregation(
+                Aggregation.match(Criteria.where("username").is(username)),
+                lookupOperation
+        );
+
+        /* For each post in postList, join comment collection with post collection */
+        MappedUser mappedUser = mongoTemplate.aggregate(aggregation, "user", MappedUser.class).getUniqueMappedResult();
+
+        if(mappedUser != null){
+            for (Post post : mappedUser.getPostList()) {
+                List<Comment> comments = commentService.findCommentsByPostId(post.getId());
+                post.setComments(comments);
+            }
+        }
+
+
+
+        return mappedUser;
     }
 
     public User getFullUserByUsername(String username) {

@@ -1,5 +1,6 @@
 package com.web.wit.user;
 
+import com.web.wit.post.Post;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -25,18 +26,9 @@ public class UserService implements IUserService, UserDetailsService {
     private final PasswordEncoder passwordEncoder;
 
 
-    /* Returns user with joined posts */
-    public MappedUser getUserByUsername(String username) {
-        LookupOperation lookupOperation = LookupOperation.newLookup()
-                .from("post")
-                .localField("username")
-                .foreignField("author")
-                .as("postList");
+    public User getUserByUsername(String username) {
+        return userRepository.findUserByUsername(username);
 
-        Aggregation aggregation = Aggregation.newAggregation(Aggregation.match(Criteria.where("username").is(username)), lookupOperation);
-
-        // map to MappedUser class
-        return mongoTemplate.aggregate(aggregation, "user", MappedUser.class).getUniqueMappedResult();
     }
 
     /* This method is used mainly for things where we don't need any join operations (e.g. joining postList to user)
