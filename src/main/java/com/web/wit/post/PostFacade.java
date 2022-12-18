@@ -39,7 +39,18 @@ public class PostFacade {
 
         Aggregation aggregation = Aggregation.newAggregation(Aggregation.match(Criteria.where("content").ne(null)), lookupOperation);
 
-        return mongoTemplate.aggregate(aggregation, "post", MappedPost.class).getMappedResults();
+        List<MappedPost> postList = mongoTemplate.aggregate(aggregation, "post", MappedPost.class).getMappedResults();
+
+        for(MappedPost post : postList){
+            List<Comment> comments = commentService.findCommentsByPostId(post.getId());
+            int commentCount = commentService.getCommentCountByPostId(post.getId());
+
+            post.setComments(comments);
+            post.setCommentCount(commentCount);
+
+        }
+
+        return postList;
 
     }
 

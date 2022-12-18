@@ -31,6 +31,10 @@ public class CommentService {
     }
 
     public List<Comment> findCommentsByPostId(String postId){
-        return commentRepository.findCommentsByPostId(postId);
+        return commentRepository.findCommentsByPostIdAndParentCommentIdIsNull(postId);
+    }
+
+    public int getCommentCountByPostId(String postId){
+        return commentRepository.countCommentsByPostId(postId);
     }
 }

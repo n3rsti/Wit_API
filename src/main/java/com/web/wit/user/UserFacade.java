@@ -46,7 +46,10 @@ public class UserFacade {
         if(mappedUser != null){
             for (Post post : mappedUser.getPostList()) {
                 List<Comment> comments = commentService.findCommentsByPostId(post.getId());
+                int commentCount = commentService.getCommentCountByPostId(post.getId());
+
                 post.setComments(comments);
+                post.setCommentCount(commentCount);
             }
         }
 

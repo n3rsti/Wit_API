@@ -11,5 +11,7 @@ import java.util.List;
 public interface CommentRepository extends MongoRepository<Comment, String> {
     Comment findCommentById(String commentId);
 
-    List<Comment> findCommentsByPostId(String postId);
+    List<Comment> findCommentsByPostIdAndParentCommentIdIsNull(String postId);
+
+    int countCommentsByPostId(String postId);
 }
