@@ -14,4 +14,6 @@ public interface CommentRepository extends MongoRepository<Comment, String> {
     List<Comment> findCommentsByPostIdAndParentCommentIdIsNull(String postId);
 
     int countCommentsByPostId(String postId);
+
+    Comment findFirstByPostIdAndContentNotNull(String postId);
 }

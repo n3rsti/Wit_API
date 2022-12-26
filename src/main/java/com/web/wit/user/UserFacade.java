@@ -3,6 +3,7 @@ package com.web.wit.user;
 
 import com.web.wit.comment.Comment;
 import com.web.wit.comment.CommentService;
+import com.web.wit.comment.MappedComment;
 import com.web.wit.post.Post;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -45,7 +46,20 @@ public class UserFacade {
 
         if(mappedUser != null){
             for (Post post : mappedUser.getPostList()) {
-                List<Comment> comments = commentService.findCommentsByPostId(post.getId());
+                LookupOperation lookupOperation1 = LookupOperation.newLookup()
+                        .from("user")
+                        .localField("author")
+                        .foreignField("username")
+                        .as("author");
+
+                // Aggregate lookup where author is the author of the post and post id is the post id of the comment
+                Aggregation aggregation1 = Aggregation.newAggregation(
+                        Aggregation.match(Criteria.where("author").is(post.getAuthor()).and("postId").is(post.getId())),
+                        lookupOperation1
+                );
+
+                List<MappedComment> comments = mongoTemplate.aggregate(aggregation1, "comment", MappedComment.class).getMappedResults();
+
                 int commentCount = commentService.getCommentCountByPostId(post.getId());
 
                 post.setComments(comments);

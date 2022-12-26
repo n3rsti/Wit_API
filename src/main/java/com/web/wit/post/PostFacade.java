@@ -42,10 +42,30 @@ public class PostFacade {
         List<MappedPost> postList = mongoTemplate.aggregate(aggregation, "post", MappedPost.class).getMappedResults();
 
         for(MappedPost post : postList){
-            List<Comment> comments = commentService.findCommentsByPostId(post.getId());
             int commentCount = commentService.getCommentCountByPostId(post.getId());
 
-            post.setComments(comments);
+            List<MappedComment> mappedComments = new ArrayList<>();
+
+            Comment comment = commentService.findTopCommentByPostId(post.getId());
+            if(comment != null){
+                MappedComment mappedTopComment = comment.toMappedComment();
+
+                User topCommentAuthor = userService.getUserByUsername(comment.getAuthor());
+                mappedTopComment.setAuthor(topCommentAuthor);
+
+                mappedComments.add(mappedTopComment);
+            }
+
+
+
+
+
+
+
+
+
+
+            post.setComments(mappedComments);
             post.setCommentCount(commentCount);
 
         }
@@ -87,9 +107,9 @@ public class PostFacade {
 
 
         // TODO: this is shit, but idk how to do it yet
-        List<Comment> comments = new ArrayList<>();
+        List<MappedComment> comments = new ArrayList<>();
 
-        for (Comment comment : mappedPost.getComments()) {
+        for (MappedComment comment : mappedPost.getComments()) {
             if (comment.getParentCommentId() == null) {
                 comments.add(comment);
             }

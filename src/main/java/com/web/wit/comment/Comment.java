@@ -4,6 +4,8 @@ import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
+
 @Data
 @Document
 public class Comment {
@@ -17,4 +19,8 @@ public class Comment {
     private String author;
 
     private String content;
+
+    public MappedComment toMappedComment() {
+        return new MappedComment(this.id, this.postId, this.parentCommentId, this.author, this.content, new ArrayList<>());
+    }
 }

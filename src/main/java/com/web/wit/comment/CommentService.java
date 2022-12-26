@@ -37,4 +37,8 @@ public class CommentService {
     public int getCommentCountByPostId(String postId){
         return commentRepository.countCommentsByPostId(postId);
     }
+
+    public Comment findTopCommentByPostId(String postId) {
+        return commentRepository.findFirstByPostIdAndContentNotNull(postId);
+    }
 }

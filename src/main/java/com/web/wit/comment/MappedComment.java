@@ -1,9 +1,11 @@
 package com.web.wit.comment;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.List;
 
+@AllArgsConstructor
 @Data
 public class MappedComment {
     private String id;
