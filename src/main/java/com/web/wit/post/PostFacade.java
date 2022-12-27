@@ -185,7 +185,7 @@ public class PostFacade {
         postService.deletePost(post);
     }
 
-    public List<Comment> findCommentsByPostId(String postId){
-        return commentService.findCommentsByPostId(postId);
+    public List<Comment> findCommentsByPostId(String postId, int page, int size){
+        return commentService.findCommentsByPostId(postId, page, size);
     }
 }

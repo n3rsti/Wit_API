@@ -56,17 +56,22 @@ public class CommentController {
     }
 
     @GetMapping(path = "posts/{postId}/comments/{commentId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getComment(@PathVariable String commentId){
+    public ResponseEntity<?> getComment(@PathVariable String commentId) {
         MappedComment comment = postFacade.findFullCommentById(commentId);
-        if(comment == null)
+        if (comment == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         return new ResponseEntity<>(comment, HttpStatus.OK);
     }
 
-    @GetMapping(path="posts/{postId}/comments")
-    public List<Comment> getCommentsByPostId(@PathVariable String postId){
-        return postFacade.findCommentsByPostId(postId);
+    @GetMapping(path = "posts/{postId}/comments")
+    public List<Comment> getCommentsByPostId(@PathVariable String postId, @RequestParam(required = false) String size, @RequestParam(required = false) String page) {
+        int intSize=1, intPage=0;
+        if(size != null)
+            intSize = Integer.parseInt(size);
+        if(page != null)
+            intPage = Integer.parseInt(page);
+        return postFacade.findCommentsByPostId(postId, intPage, intSize);
     }
 
 

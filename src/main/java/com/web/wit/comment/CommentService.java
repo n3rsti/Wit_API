@@ -3,12 +3,15 @@ package com.web.wit.comment;
 import com.web.wit.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.LookupOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
+import java.awt.print.Pageable;
 import java.util.List;
 
 @Service
@@ -30,8 +33,8 @@ public class CommentService {
         return commentRepository.findCommentById(commentId);
     }
 
-    public List<Comment> findCommentsByPostId(String postId){
-        return commentRepository.findCommentsByPostIdAndParentCommentIdIsNull(postId);
+    public List<Comment> findCommentsByPostId(String postId, int page, int size){
+        return commentRepository.findCommentsByPostIdAndParentCommentIdIsNull(postId, PageRequest.of(page, size));
     }
 
     public int getCommentCountByPostId(String postId){
