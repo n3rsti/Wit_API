@@ -52,10 +52,11 @@ public class UserFacade {
                         .foreignField("username")
                         .as("author");
 
-                // Aggregate lookup where author is the author of the post and post id is the post id of the comment
+                // Aggregate lookup where post id is the post id of the comment
                 Aggregation aggregation1 = Aggregation.newAggregation(
-                        Aggregation.match(Criteria.where("author").is(post.getAuthor()).and("postId").is(post.getId())),
-                        lookupOperation1
+                        Aggregation.match(Criteria.where("postId").is(post.getId())),
+                        lookupOperation1,
+                        Aggregation.limit(1)
                 );
 
                 List<MappedComment> comments = mongoTemplate.aggregate(aggregation1, "comment", MappedComment.class).getMappedResults();
