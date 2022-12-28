@@ -65,13 +65,16 @@ public class CommentController {
     }
 
     @GetMapping(path = "posts/{postId}/comments")
-    public List<Comment> getCommentsByPostId(@PathVariable String postId, @RequestParam(required = false) String size, @RequestParam(required = false) String page) {
-        int intSize=1, intPage=0;
+    public List<MappedComment> getCommentsByPostId(@PathVariable String postId, @RequestParam(required = false) String skipCount, @RequestParam(required = false) String size) {
+        int intSkipCount = 0;
+        int intSize = 3;
+
+        if(skipCount != null)
+            intSkipCount = Integer.parseInt(skipCount);
         if(size != null)
             intSize = Integer.parseInt(size);
-        if(page != null)
-            intPage = Integer.parseInt(page);
-        return postFacade.findCommentsByPostId(postId, intPage, intSize);
+
+        return postFacade.findCommentsByPostId(postId, intSkipCount, intSize);
     }
 
 

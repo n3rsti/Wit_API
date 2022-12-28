@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.LookupOperation;
+import org.springframework.data.mongodb.core.aggregation.VariableOperators;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
@@ -37,7 +38,7 @@ public class PostFacade {
                 .foreignField("username")
                 .as("author");
 
-        Aggregation aggregation = Aggregation.newAggregation(Aggregation.match(Criteria.where("content").ne(null)), lookupOperation);
+        Aggregation aggregation = Aggregation.newAggregation(Aggregation.match(Criteria.where("content").ne(null)), lookupOperation, Aggregation.skip(Long.valueOf(1)));
 
         List<MappedPost> postList = mongoTemplate.aggregate(aggregation, "post", MappedPost.class).getMappedResults();
 
@@ -185,7 +186,15 @@ public class PostFacade {
         postService.deletePost(post);
     }
 
-    public List<Comment> findCommentsByPostId(String postId, int page, int size){
-        return commentService.findCommentsByPostId(postId, page, size);
+    public List<MappedComment> findCommentsByPostId(String postId, int skipCount, int size){
+        LookupOperation authorJoinOperation = LookupOperation.newLookup()
+                .from("user")
+                .localField("author")
+                .foreignField("username")
+                .as("author");
+
+        Aggregation aggregation = Aggregation.newAggregation(Aggregation.match(Criteria.where("postId").is(postId)), authorJoinOperation, Aggregation.skip((long) skipCount), Aggregation.limit(size));
+
+        return mongoTemplate.aggregate(aggregation, "comment", MappedComment.class).getMappedResults();
     }
 }
